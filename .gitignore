@@ -8,6 +8,7 @@ node_modules/
 npm-debug.log*
 .DS_Store
 .run/
+.env-teste
 
 # backups do banco gerados em testes
 *.db.bak-*
