@@ -1,0 +1,20 @@
+<%- include('../partials/head') %>
+
+<h1 class="pagina-titulo">🛠️ Painel do administrador</h1>
+<p class="form-sub">Você administra a plataforma: vê usuários e corridas, bane contas e remove corridas. Contas de admin não oferecem nem pedem carona.</p>
+
+<div class="admin-cards">
+  <div class="admin-card"><span class="admin-num"><%= totais.usuarios %></span><span>Usuários</span></div>
+  <div class="admin-card"><span class="admin-num"><%= totais.banidos %></span><span>Banidos</span></div>
+  <div class="admin-card"><span class="admin-num"><%= totais.admins %></span><span>Admins</span></div>
+  <div class="admin-card"><span class="admin-num"><%= totais.caronas %></span><span>Corridas</span></div>
+  <div class="admin-card"><span class="admin-num"><%= totais.caronasAtivas %></span><span>Corridas ativas</span></div>
+  <div class="admin-card"><span class="admin-num"><%= totais.reservas %></span><span>Reservas</span></div>
+</div>
+
+<div class="admin-atalhos">
+  <a href="/admin/usuarios" class="btn btn-primary">👥 Gerenciar usuários</a>
+  <a href="/admin/caronas" class="btn btn-ghost">🚗 Ver corridas</a>
+</div>
+
+<%- include('../partials/footer') %>

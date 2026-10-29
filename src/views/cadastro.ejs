@@ -1,0 +1,49 @@
+<%- include('partials/head') %>
+
+<div class="form-wrap">
+  <h1 class="form-titulo">Criar conta</h1>
+  <p class="form-sub">
+    Use seu e-mail institucional
+    (<%= dominios.map(function(d){ return '@' + d; }).join(' ou ') %>).
+  </p>
+
+  <form action="/cadastro" method="POST" class="form">
+    <label>
+      Nome completo
+      <input type="text" name="nome" value="<%= dados.nome || '' %>" required>
+    </label>
+
+    <div class="form-linha">
+      <label>
+        RA
+        <input type="text" name="ra" value="<%= dados.ra || '' %>" placeholder="Ex.: 251178">
+      </label>
+      <label>
+        Telefone / WhatsApp
+        <input type="text" name="telefone" value="<%= dados.telefone || '' %>" placeholder="(15) 99999-9999">
+      </label>
+    </div>
+
+    <label>
+      E-mail institucional
+      <input type="email" name="email" value="<%= dados.email || '' %>" placeholder="nome.sobrenome@facens.br" required>
+    </label>
+
+    <div class="form-linha">
+      <label>
+        Senha
+        <input type="password" name="senha" minlength="6" required>
+      </label>
+      <label>
+        Confirmar senha
+        <input type="password" name="confirmar_senha" minlength="6" required>
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+  </form>
+
+  <p class="form-rodape">Já tem conta? <a href="/login">Entrar</a></p>
+</div>
+
+<%- include('partials/footer') %>

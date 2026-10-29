@@ -1,0 +1,16 @@
+<% if (typeof corridaAoVivo !== 'undefined' && corridaAoVivo && path !== ('/caronas/' + corridaAoVivo.id + '/mapa')) { %>
+  <div class="corrida-aovivo-banner">
+    <div class="corrida-aovivo-info">
+      <span class="corrida-aovivo-pulse" aria-hidden="true"></span>
+      <div>
+        <strong>Você está em uma corrida</strong>
+        <span class="corrida-aovivo-rota">
+          <%= corridaAoVivo.origem %> → <%= corridaAoVivo.destino %>
+          · 🕒 <%= corridaAoVivo.horario %>
+          · <%= corridaAoVivo.papel === 'motorista' ? '🚗 você é o motorista' : '🧍 com ' + corridaAoVivo.motorista_nome %>
+        </span>
+      </div>
+    </div>
+    <a href="/caronas/<%= corridaAoVivo.id %>/mapa?compartilhar=1" class="btn btn-primary btn-sm">📍 Compartilhar localização</a>
+  </div>
+<% } %>

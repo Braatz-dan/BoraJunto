@@ -1,0 +1,56 @@
+<%- include('../partials/head') %>
+
+<a href="/admin" class="link-voltar">← Painel</a>
+<h1 class="pagina-titulo">👥 Usuários</h1>
+
+<form action="/admin/usuarios/banir" method="POST" class="admin-banir-form">
+  <input type="email" name="email" placeholder="e-mail do usuário a banir" required>
+  <button type="submit" class="btn btn-perigo"
+          onclick="return confirm('Banir este e-mail? A pessoa não conseguirá mais entrar.');">Banir por e-mail</button>
+</form>
+
+<div class="admin-tabela-wrap">
+  <table class="admin-tabela">
+    <thead>
+      <tr>
+        <th>Usuário</th><th>E-mail</th><th>Papel</th><th>Corridas</th><th>Reservas</th><th>Nota</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% usuarios.forEach(function(u){ %>
+        <tr class="<%= u.banido ? 'linha-banido' : '' %>">
+          <td>
+            <span class="admin-avatar">
+              <% if (u.foto) { %><img src="<%= u.foto %>" alt=""><% } else { %><%= u.nome.charAt(0).toUpperCase() %><% } %>
+            </span>
+            <a href="/usuarios/<%= u.id %>"><%= u.nome %></a>
+          </td>
+          <td><%= u.email %></td>
+          <td><%= u.papel === 'admin' ? '🛠️ admin' : 'usuário' %></td>
+          <td><%= u.n_caronas %></td>
+          <td><%= u.n_reservas %></td>
+          <td><%= u.nota != null ? '⭐ ' + u.nota : '—' %></td>
+          <td><% if (u.banido) { %><span class="badge badge-lotada">banido</span><% } else { %><span class="badge badge-ativa">ativo</span><% } %></td>
+          <td>
+            <% if (u.papel !== 'admin' && u.id !== usuario.id) { %>
+              <% if (u.banido) { %>
+                <form action="/admin/usuarios/<%= u.id %>/desbanir" method="POST" class="inline">
+                  <button class="btn btn-ghost btn-sm">Desbanir</button>
+                </form>
+              <% } else { %>
+                <form action="/admin/usuarios/<%= u.id %>/banir" method="POST" class="inline"
+                      onclick="return confirm('Banir <%= u.nome %>?');">
+                  <button class="btn btn-ghost btn-sm btn-perigo">Banir</button>
+                </form>
+              <% } %>
+            <% } else { %>
+              <span class="vazio-inline">—</span>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

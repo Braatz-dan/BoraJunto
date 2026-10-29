@@ -1,0 +1,113 @@
+<%- include('../partials/head') %>
+
+<div class="pagina-cabecalho">
+  <h1>Buscar carona</h1>
+  <a href="/caronas/oferecer" class="btn btn-ghost btn-sm">+ Oferecer carona</a>
+</div>
+
+<%
+  // Rótulos que mudam conforme o sentido escolhido.
+  var ROTULOS = {
+    'ida':   { cep: 'CEP de origem',    reg: 'Bairro de origem (de onde você sai)', ph: 'Ex.: Éden — de onde você sai' },
+    'volta': { cep: 'CEP de destino',   reg: 'Bairro de destino (para onde volta)', ph: 'Ex.: Centro — para onde você volta' },
+  };
+  var rot = ROTULOS[filtros.sentido] || ROTULOS['volta'];
+%>
+<form action="/caronas/buscar" method="GET" class="filtros">
+  <label>
+    Sentido
+    <select name="sentido" id="sentido">
+      <option value="volta" <%= filtros.sentido === 'ida' ? '' : 'selected' %>>🏠 Volta (da Facens)</option>
+      <option value="ida" <%= filtros.sentido === 'ida' ? 'selected' : '' %>>🎓 Ida (para a Facens)</option>
+    </select>
+  </label>
+  <label>
+    <span id="cepLabel"><%= rot.cep %></span>
+    <input type="text" name="cep" id="cep" value="<%= filtros.cep %>" placeholder="Ex.: 18055-000" maxlength="9" inputmode="numeric" autocomplete="postal-code">
+  </label>
+  <label>
+    <span id="regiaoLabel"><%= rot.reg %></span>
+    <input type="text" name="regiao" id="regiao" value="<%= filtros.regiao %>" placeholder="<%= rot.ph %>">
+  </label>
+  <label>
+    Dia da semana
+    <select name="diaSemana">
+      <option value="">Qualquer dia</option>
+      <option value="uteis" <%= filtros.diaSemana === 'uteis' ? 'selected' : '' %>>Dias úteis (seg–sex)</option>
+      <% diasSemana.forEach(function(nome, i){ %>
+        <option value="<%= i %>" <%= String(filtros.diaSemana) === String(i) ? 'selected' : '' %>><%= nome %></option>
+      <% }) %>
+    </select>
+  </label>
+  <label>
+    A partir das
+    <input type="time" name="horario" value="<%= filtros.horario %>">
+  </label>
+  <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<% if (regiaoResolvida) { %>
+  <p class="regiao-banner">
+    📍 Mostrando caronas na região de
+    <strong><%= regiaoResolvida.bairro ? regiaoResolvida.bairro + ' — ' : '' %><%= regiaoResolvida.cidade %>/<%= regiaoResolvida.uf %></strong>
+    (CEP <%= filtros.cep %>)
+  </p>
+<% } %>
+
+<% if (resultados.length === 0) { %>
+  <div class="vazio">
+    <p>😕 Nenhuma carona compatível encontrada.</p>
+    <p class="vazio-sub">Tente ampliar o filtro (outro dia da semana ou região) ou volte mais tarde.</p>
+  </div>
+<% } else { %>
+  <p class="resultado-contagem"><%= resultados.length %> carona(s) encontrada(s)</p>
+
+  <% if (filtros.sentido !== 'ida') { %>
+  <section class="grupo-sentido">
+    <h2 class="grupo-titulo"><span class="grupo-ic">🏠</span> Volta — da Facens <span class="grupo-contagem"><%= voltas.length %></span></h2>
+    <% if (voltas.length === 0) { %>
+      <p class="vazio-inline">Nenhuma carona de volta com esses filtros.</p>
+    <% } else { %>
+      <div class="lista-caronas">
+        <% voltas.forEach(function(c){ %><%- include('../partials/carona-card', { c: c }) %><% }) %>
+      </div>
+    <% } %>
+  </section>
+  <% } %>
+
+  <% if (filtros.sentido !== 'volta') { %>
+  <section class="grupo-sentido">
+    <h2 class="grupo-titulo"><span class="grupo-ic">🎓</span> Ida — para a Facens <span class="grupo-contagem"><%= idas.length %></span></h2>
+    <% if (idas.length === 0) { %>
+      <p class="vazio-inline">Nenhuma carona de ida com esses filtros.</p>
+    <% } else { %>
+      <div class="lista-caronas">
+        <% idas.forEach(function(c){ %><%- include('../partials/carona-card', { c: c }) %><% }) %>
+      </div>
+    <% } %>
+  </section>
+  <% } %>
+<% } %>
+
+<script>
+  // Ajusta os rótulos de CEP/Região conforme o Sentido escolhido (sem recarregar).
+  (function () {
+    var sel = document.getElementById('sentido');
+    var cepLabel = document.getElementById('cepLabel');
+    var regLabel = document.getElementById('regiaoLabel');
+    var regInput = document.getElementById('regiao');
+    if (!sel) return;
+    var R = {
+      'ida':   { cep: 'CEP de origem',  reg: 'Bairro de origem (de onde você sai)', ph: 'Ex.: Éden — de onde você sai' },
+      'volta': { cep: 'CEP de destino', reg: 'Bairro de destino (para onde volta)', ph: 'Ex.: Centro — para onde você volta' },
+    };
+    sel.addEventListener('change', function () {
+      var r = R[sel.value] || R['volta'];
+      if (cepLabel) cepLabel.textContent = r.cep;
+      if (regLabel) regLabel.textContent = r.reg;
+      if (regInput) regInput.setAttribute('placeholder', r.ph);
+    });
+  })();
+</script>
+<script src="/js/cep.js" defer></script>
+<%- include('../partials/footer') %>

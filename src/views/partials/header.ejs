@@ -1,0 +1,49 @@
+<header class="topo">
+  <div class="topo-inner container">
+    <a class="marca" href="/">
+      <span class="marca-logo" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="9" fill="var(--primaria)"/>
+          <path d="M16 6c-4.4 0-8 3.4-8 7.6 0 5.4 8 12.4 8 12.4s8-7 8-12.4C24 9.4 20.4 6 16 6Zm0 10.2a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2Z" fill="white"/>
+        </svg>
+      </span>
+      <span class="marca-nome">Bora<strong>Junto</strong></span>
+    </a>
+    <nav class="nav">
+      <% if (usuario && usuario.papel === 'admin') { %>
+        <a href="/admin">Painel</a>
+        <a href="/admin/usuarios">Usuários</a>
+        <a href="/admin/caronas">Corridas</a>
+        <a href="/usuarios/<%= usuario.id %>" class="nav-perfil">
+          <span class="nav-avatar">
+            <% if (usuario.foto) { %><img src="<%= usuario.foto %>" alt=""><% } else { %><%= usuario.nome.charAt(0).toUpperCase() %><% } %>
+          </span>
+          <span class="nav-nome">🛠️ <%= usuario.nome.split(' ')[0] %></span>
+        </a>
+        <form action="/logout" method="POST" class="nav-logout">
+          <button type="submit" class="btn btn-ghost btn-sm">Sair</button>
+        </form>
+      <% } else if (usuario) { %>
+        <a href="/caronas/buscar">Buscar</a>
+        <a href="/caronas/oferecer">Oferecer</a>
+        <a href="/caronas/minhas">Minhas caronas</a>
+        <a href="/usuarios/<%= usuario.id %>" class="nav-perfil">
+          <span class="nav-avatar">
+            <% if (usuario.foto) { %>
+              <img src="<%= usuario.foto %>" alt="">
+            <% } else { %>
+              <%= usuario.nome.charAt(0).toUpperCase() %>
+            <% } %>
+          </span>
+          <span class="nav-nome"><%= usuario.nome.split(' ')[0] %></span>
+        </a>
+        <form action="/logout" method="POST" class="nav-logout">
+          <button type="submit" class="btn btn-ghost btn-sm">Sair</button>
+        </form>
+      <% } else { %>
+        <a href="/login">Entrar</a>
+        <a href="/cadastro" class="btn btn-primary btn-sm">Criar conta</a>
+      <% } %>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,206 @@
+<%- include('../partials/head') %>
+
+<div class="form-wrap form-wrap-lg">
+  <h1 class="form-titulo">Oferecer carona</h1>
+  <p class="form-sub">Publique sua rota, horário e vagas. Os passageiros pedem e você aceita.</p>
+
+  <form action="/caronas/oferecer" method="POST" class="form">
+    <label>
+      Sentido da carona
+      <select name="sentido" required>
+        <option value="volta" <%= dados.sentido === 'ida' ? '' : 'selected' %>>🏠 Volta — saindo da Facens</option>
+        <option value="ida" <%= dados.sentido === 'ida' ? 'selected' : '' %>>🎓 Ida — indo para a Facens</option>
+      </select>
+    </label>
+
+    <div class="form-linha">
+      <label>
+        Origem
+        <input type="text" name="origem" value="<%= dados.origem||'Facens' %>" placeholder="Ex.: Facens" required>
+      </label>
+      <label>
+        Destino (bairro / região)
+        <input type="text" name="destino" value="<%= dados.destino||'' %>" placeholder="Ex.: Centro de Sorocaba" required>
+      </label>
+    </div>
+
+    <label>
+      Ponto de referência (onde você deixa)
+      <input type="text" name="ponto_referencia" value="<%= dados.ponto_referencia||'' %>" placeholder="Ex.: Terminal São Bento">
+    </label>
+
+    <div class="form-linha">
+      <label>
+        CEP do destino
+        <input type="text" name="cep" id="cep" value="<%= dados.cep||'' %>" placeholder="Ex.: 18055-000" maxlength="9" inputmode="numeric" autocomplete="postal-code">
+      </label>
+      <label>
+        Bairro
+        <input type="text" name="bairro" id="bairro" value="<%= dados.bairro||'' %>" placeholder="Preenche pelo CEP (ou digite)">
+      </label>
+    </div>
+    <p class="form-dica" id="cepInfo">Digite o CEP e o <strong>bairro</strong> é preenchido automaticamente — assim sua carona aparece nas buscas por região. Você pode ajustar o bairro à mão.</p>
+
+    <label>
+      Horário de saída
+      <input type="time" name="horario" value="<%= dados.horario||'22:40' %>" required>
+    </label>
+
+    <label class="switch-recorrente">
+      <input type="checkbox" name="recorrente" id="recorrente" value="1" <%= dados.recorrente ? 'checked' : '' %>>
+      <span>🔁 Repetir toda semana <small>(criar uma rotina em vez de uma carona única)</small></span>
+    </label>
+
+    <!-- Carona única: data específica -->
+    <label id="bloco-data">
+      Data
+      <input type="date" name="data_viagem" id="data_viagem" value="<%= dados.data_viagem||'' %>">
+    </label>
+
+    <!-- Rotina: dias da semana + validade opcional -->
+    <fieldset class="form-fieldset" id="bloco-rotina" hidden>
+      <legend>🔁 Dias da rotina</legend>
+      <p class="form-dica">A carona é publicada sozinha nos dias marcados, sempre no horário acima. Geramos os próximos dias; conforme o tempo passa, novas datas entram automaticamente.</p>
+      <div class="dias-semana">
+        <% var selDias = [].concat(dados.dias_semana || []).map(String);
+           var ordemDias = [1, 2, 3, 4, 5, 6, 0]; // Seg..Dom (ordem natural) %>
+        <% ordemDias.forEach(function(d){ %>
+          <label class="dia-chip">
+            <input type="checkbox" name="dias_semana" value="<%= d %>" <%= selDias.includes(String(d)) ? 'checked' : '' %>>
+            <span><%= diasSemana[d].slice(0, 3) %></span>
+          </label>
+        <% }) %>
+      </div>
+      <label>
+        Repetir até (opcional)
+        <input type="date" name="validade" value="<%= dados.validade||'' %>">
+      </label>
+    </fieldset>
+
+    <fieldset class="form-fieldset">
+      <legend>🚗 Carro da carona</legend>
+
+      <label>
+        Escolha o carro
+        <select id="veiculo_salvo">
+          <% (veiculos || []).forEach(function(v){ %>
+            <option value="<%= v.id %>"
+                    data-modelo="<%= v.modelo %>"
+                    data-placa="<%= v.placa || '' %>"
+                    data-cor="<%= v.cor || '' %>"
+                    data-capacidade="<%= v.capacidade %>">
+              <%= v.modelo %><%= v.placa ? ' · ' + v.placa : '' %><%= v.cor ? ' · ' + v.cor : '' %>
+            </option>
+          <% }) %>
+          <!-- Sempre disponível, ao lado dos carros salvos -->
+          <option value="novo" <%= (dados.veiculo_modelo || !(veiculos && veiculos.length)) ? 'selected' : '' %>>➕ Adicionar novo carro</option>
+        </select>
+      </label>
+
+      <div class="form-linha">
+        <label>
+          Modelo do carro
+          <input type="text" name="veiculo_modelo" id="veiculo_modelo" value="<%= dados.veiculo_modelo||'' %>" placeholder="Ex.: Honda Fit" required>
+        </label>
+        <label>
+          Lugares disponíveis
+          <input type="number" name="vagas_total" id="vagas_total" min="1" max="8" value="<%= dados.vagas_total||3 %>" required>
+        </label>
+      </div>
+      <div class="form-linha">
+        <label>
+          Placa
+          <input type="text" name="veiculo_placa" id="veiculo_placa" value="<%= dados.veiculo_placa||'' %>" placeholder="Ex.: ABC1D23" maxlength="8">
+        </label>
+        <label>
+          Cor
+          <input type="text" name="veiculo_cor" id="veiculo_cor" value="<%= dados.veiculo_cor||'' %>" placeholder="Ex.: Prata">
+        </label>
+      </div>
+
+      <label class="switch-recorrente" id="bloco-salvar-veiculo">
+        <input type="checkbox" name="salvar_veiculo" id="salvar_veiculo" value="1">
+        <span>💾 Salvar este carro no meu perfil <small>(para reusar nas próximas caronas)</small></span>
+      </label>
+
+      <p class="form-dica">Os <strong>lugares</strong> são os assentos que você oferece. A cada passageiro aceito, um lugar é ocupado — quando zerar, a carona fica <strong>lotada</strong> e some das buscas. Você também gerencia seus carros em <a href="/usuarios/<%= usuario.id %>">Meu perfil</a>.</p>
+    </fieldset>
+
+    <label>
+      Preço por pessoa (R$)
+      <input type="text" name="valor_rateio" value="<%= dados.valor_rateio||'0' %>" placeholder="Ex.: 8,00">
+    </label>
+
+    <label>
+      Observações
+      <textarea name="observacoes" rows="3" placeholder="Ex.: saio logo após a última aula, levo até pontos no caminho."><%= dados.observacoes||'' %></textarea>
+    </label>
+
+    <button type="submit" class="btn btn-primary btn-block" id="btn-publicar">Publicar carona</button>
+  </form>
+</div>
+
+<script src="/js/cep.js" defer></script>
+<script>
+  // Alterna entre carona única (data) e rotina semanal (dias da semana).
+  (function () {
+    var chk = document.getElementById('recorrente');
+    var blocoData = document.getElementById('bloco-data');
+    var blocoRotina = document.getElementById('bloco-rotina');
+    var inputData = document.getElementById('data_viagem');
+    var botao = document.getElementById('btn-publicar');
+    if (!chk) return;
+    function aplicar() {
+      var r = chk.checked;
+      blocoData.hidden = r;
+      blocoRotina.hidden = !r;
+      if (inputData) inputData.required = !r; // data só é obrigatória na carona única
+      botao.textContent = r ? 'Criar rotina' : 'Publicar carona';
+    }
+    chk.addEventListener('change', aplicar);
+    aplicar(); // aplica o estado inicial (inclui re-render após erro)
+  })();
+
+  // Seletor de carro salvo: preenche os campos; "Adicionar novo carro" libera a digitação.
+  (function () {
+    var sel = document.getElementById('veiculo_salvo');
+    if (!sel) return;
+    var modelo = document.getElementById('veiculo_modelo');
+    var placa = document.getElementById('veiculo_placa');
+    var cor = document.getElementById('veiculo_cor');
+    var vagas = document.getElementById('vagas_total');
+    var blocoSalvar = document.getElementById('bloco-salvar-veiculo');
+    var chkSalvar = document.getElementById('salvar_veiculo');
+
+    function travar(campo, travado) {
+      campo.readOnly = travado;
+      campo.classList.toggle('campo-travado', travado);
+    }
+
+    function aplicar(limparSeNovo) {
+      var op = sel.options[sel.selectedIndex];
+      var novo = sel.value === 'novo';
+      if (novo) {
+        // Carro novo: campos livres para digitar + opção de salvar no perfil.
+        // Limpa só quando o usuário escolhe "novo" (não ao recarregar após erro).
+        if (limparSeNovo) { modelo.value = ''; placa.value = ''; cor.value = ''; }
+        [modelo, placa, cor].forEach(function (c) { travar(c, false); });
+        blocoSalvar.hidden = false;
+      } else {
+        // Carro salvo: preenche e trava (não precisa salvar de novo).
+        modelo.value = op.dataset.modelo || '';
+        placa.value = op.dataset.placa || '';
+        cor.value = op.dataset.cor || '';
+        if (op.dataset.capacidade) vagas.value = op.dataset.capacidade;
+        [modelo, placa, cor].forEach(function (c) { travar(c, true); });
+        blocoSalvar.hidden = true;
+        if (chkSalvar) chkSalvar.checked = false;
+      }
+    }
+    sel.addEventListener('change', function () { aplicar(true); });
+    // Começa em "novo carro" quando não há carro salvo; senão, no primeiro salvo.
+    // Não limpa no load para preservar valores re-renderizados após erro.
+    aplicar(false);
+  })();
+</script>
+<%- include('../partials/footer') %>

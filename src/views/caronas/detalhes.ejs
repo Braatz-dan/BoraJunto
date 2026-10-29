@@ -1,0 +1,124 @@
+<%- include('../partials/head') %>
+
+<a href="/caronas/buscar" class="link-voltar">← Voltar para a busca</a>
+
+<div class="detalhe-carona">
+  <div class="detalhe-rota">
+    <span class="ponto"><%= carona.origem %></span>
+    <span class="seta">→</span>
+    <span class="ponto"><%= carona.destino %></span>
+  </div>
+
+  <% var lotada = carona.vagas_disponiveis <= 0;
+     var DIAS_EXT = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+     var diaExt = DIAS_EXT[new Date(carona.data_viagem + 'T00:00:00').getDay()]; %>
+  <div class="detalhe-grid">
+    <div><span class="rotulo">Data</span><%= diaExt %>, <%= carona.data_viagem.split('-').reverse().join('/') %></div>
+    <div><span class="rotulo">Horário de saída</span><%= carona.horario %></div>
+    <% if (carona.bairro || carona.cidade) { %>
+      <div><span class="rotulo">Região</span><%= [carona.bairro, carona.cidade].filter(Boolean).join(' — ') %><%= carona.uf ? '/' + carona.uf : '' %><%= carona.cep ? ' · CEP ' + carona.cep : '' %></div>
+    <% } %>
+    <div>
+      <span class="rotulo">Lugares</span>
+      <% if (lotada) { %><span class="badge badge-lotada">Lotada</span>
+      <% } else { %><%= carona.vagas_disponiveis %> de <%= carona.vagas_total %> livres<% } %>
+    </div>
+    <div><span class="rotulo">Preço</span>R$ <%= Number(carona.valor_rateio).toFixed(2) %></div>
+    <div><span class="rotulo">Sentido</span><%= carona.sentido === 'ida' ? '🎓 Ida (para a Facens)' : '🏠 Volta (da Facens)' %></div>
+    <% if (carona.veiculo_modelo) { %>
+      <div><span class="rotulo">Carro</span><%= carona.veiculo_modelo %><% if (carona.veiculo_cor) { %> · <%= carona.veiculo_cor %><% } %><% if (carona.veiculo_placa) { %> · <%= carona.veiculo_placa %><% } %></div>
+    <% } %>
+    <% if (carona.ponto_referencia) { %>
+      <div><span class="rotulo">Ponto de referência</span><%= carona.ponto_referencia %></div>
+    <% } %>
+    <div><span class="rotulo">Status</span><%= carona.status %></div>
+  </div>
+
+  <% if (carona.observacoes) { %>
+    <p class="detalhe-obs">📝 <%= carona.observacoes %></p>
+  <% } %>
+
+  <div class="detalhe-motorista">
+    <div>
+      <span class="rotulo">Motorista</span>
+      <button type="button" class="link-motorista" data-abrir-avaliacoes><%= carona.motorista_nome %></button>
+      <% if (reputacao && reputacao.total > 0) { %>
+        <span class="nota">⭐ <%= reputacao.media %> (<%= reputacao.total %>)</span>
+      <% } %>
+      <br>
+      <button type="button" class="link-ver-avaliacoes" data-abrir-avaliacoes>
+        ver avaliações<% if (reputacao && reputacao.total > 0) { %> (<%= reputacao.total %>)<% } %>
+      </button>
+    </div>
+  </div>
+
+  <!-- Avaliações do motorista: div flutuante que fecha ao clicar fora -->
+  <div class="aval-overlay" id="avalOverlay" hidden>
+    <div class="aval-box" role="dialog" aria-modal="true" aria-label="Avaliações do motorista">
+      <div class="aval-box-topo">
+        <h3>Avaliações de <%= carona.motorista_nome %></h3>
+        <button type="button" class="aval-fechar" id="avalFechar" aria-label="Fechar">✕</button>
+      </div>
+      <p class="aval-resumo">
+        <% if (reputacao && reputacao.total > 0) { %>
+          ⭐ <%= reputacao.media %> · <%= reputacao.total %> avaliação(ões)
+        <% } else { %>
+          Ainda sem avaliações.
+        <% } %>
+      </p>
+      <% if (avaliacoesMotorista && avaliacoesMotorista.length) { %>
+        <div class="lista-avaliacoes">
+          <% avaliacoesMotorista.forEach(function(a){ %>
+            <div class="avaliacao-item">
+              <div class="avaliacao-topo">
+                <span class="avaliacao-estrelas"><%= '⭐'.repeat(a.nota) %></span>
+                <span class="avaliacao-autor">— <%= a.avaliador_nome %></span>
+              </div>
+              <% if (a.comentario) { %><p class="avaliacao-texto"><%= a.comentario %></p><% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+      <a href="/usuarios/<%= carona.motorista_id %>" class="aval-perfil">Ver perfil completo →</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var overlay = document.getElementById('avalOverlay');
+      if (!overlay) return;
+      var abrir = function () { overlay.hidden = false; };
+      var fechar = function () { overlay.hidden = true; };
+      document.querySelectorAll('[data-abrir-avaliacoes]').forEach(function (b) {
+        b.addEventListener('click', abrir);
+      });
+      document.getElementById('avalFechar').addEventListener('click', fechar);
+      // Clicar fora da caixa (no fundo escuro) fecha.
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) fechar();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !overlay.hidden) fechar();
+      });
+    })();
+  </script>
+
+  <div class="detalhe-acoes">
+    <% if (usuario.id === carona.motorista_id) { %>
+      <p class="aviso">Esta é a sua carona. Gerencie os pedidos em <a href="/caronas/minhas">Minhas caronas</a>.</p>
+    <% } else if (minhaReserva) { %>
+      <p class="aviso">Você já pediu esta carona — status: <strong><%= minhaReserva.status %></strong>.</p>
+      <button type="button" class="btn btn-ghost" data-chat-reserva="<%= minhaReserva.id %>">💬 Conversar com o motorista</button>
+    <% } else if (carona.status !== 'ativa') { %>
+      <p class="aviso">Esta carona não está mais disponível.</p>
+    <% } else if (lotada) { %>
+      <p class="aviso">🚗 Carona <strong>lotada</strong> — todos os lugares já foram ocupados.</p>
+    <% } else { %>
+      <form action="/caronas/<%= carona.id %>/reservar" method="POST">
+        <button type="submit" class="btn btn-primary btn-lg">Pedir carona</button>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

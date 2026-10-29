@@ -1,0 +1,41 @@
+🎬 Roteiro — vídeo demo do BoraJunto (~5 min)
+Antes de gravar (setup)
+Rode o app: npm start → abra http://localhost:3000 (no localhost a localização funciona; em http:// normal não funcionaria).
+Abra duas janelas do navegador lado a lado:
+Janela A (normal): motorista → rafael.andrade@facens.br / 123456
+Janela B (anônima): passageiro → bruno.carvalho@facens.br / 123456
+Contas extras se precisar: mariana.lopes@facens.br, paula.ribeiro@facens.br (sem corridas), admin@facens.br / admin123.
+Deixe o som do narrador; fale enquanto clica.
+0:00 – 0:30 · Abertura
+Fala: “BoraJunto é uma plataforma de caronas para estudantes da Facens. Vou mostrar o fluxo completo: oferecer, pedir, conversar, acompanhar a corrida ao vivo no mapa, avaliar e a área de administração.”
+Tela: página inicial → login na Janela A como Rafael (motorista).
+0:30 – 1:15 · Oferecer carona (com carro salvo)
+Faça (Janela A): menu Oferecer → preencha destino/horário → no bloco 🚗 Carro da carona, abra o seletor e mostre o Honda Fit salvo + a opção ➕ Adicionar novo carro.
+Fala: “O motorista cadastra o carro uma vez no perfil e reaproveita aqui — ou adiciona um novo na hora.” Publique a carona.
+1:15 – 2:05 · Buscar, pedir e aceitar
+Faça (Janela B – Bruno): Buscar → mostre que só aparecem corridas futuras → abra os detalhes → clique no nome do motorista / “ver avaliações” (abre o modal de avaliações, fecha clicando fora) → Pedir carona.
+Faça (Janela A – Rafael): Minhas caronas → Aceitar o pedido do Bruno.
+Fala: “O passageiro pede, o motorista aceita, e abre um chat entre os dois.”
+2:05 – 2:35 · Chat
+Faça: abra o 💬 Conversar nas duas janelas e troque uma mensagem rápida (aparece em tempo real).
+2:35 – 3:30 · Iniciar corrida + localização ao vivo (o destaque)
+Faça (Janela A): em Minhas caronas, 🚦 Iniciar corrida → informe “10 min” e ponto de encontro.
+Faça (Janela B): mostre a mensagem chegando no chat do passageiro (“corrida vai começar em até 10 min, ponto de encontro…”) e o aviso “Você está em uma corrida” com o botão 📍 Compartilhar localização.
+Faça (nas duas): clique em Compartilhar localização → permita no navegador → mostre os dois marcadores no mapa (motorista verde, passageiro laranja) e o “2 pessoas compartilhando agora”.
+Fala: “Ao iniciar, todos os passageiros são avisados e podem acompanhar a corrida no mapa em tempo real.”
+3:30 – 4:10 · Finalizar + avaliar
+Faça (Janela A): 🏁 Finalizar corrida.
+Faça (Janela B): mostre a mensagem de finalização no chat → ⭐ Avaliar motorista → dê uma nota (1–5) e um comentário → envie.
+Fala: “No fim, o passageiro recebe o aviso e avalia o motorista — a nota entra na reputação dele.”
+4:10 – 4:30 · (bônus rápido) Foto de perfil
+Faça (Janela A): Meu perfil → Foto de perfil → escolher imagem → salvar (o avatar muda no topo).
+(Se o tempo apertar, pule este trecho.)
+4:30 – 5:00 · Área de administração
+Faça: faça login (ou troque pra uma 3ª aba) como admin@facens.br / admin123 → cai direto no Painel (números gerais).
+Mostre: Usuários (lista + banir por e-mail) e Corridas (todas, com remover).
+Fala: “O admin não pega carona — ele administra: vê usuários e corridas e pode banir uma conta por e-mail; quem é banido não consegue mais entrar.” Encerre.
+Dicas de gravação
+70% coberto: cadastro/login, oferecer, carro salvo, buscar (só futuras), pedir/aceitar, chat, iniciar + aviso, mapa ao vivo, finalizar + avaliar, modal de avaliações, foto de perfil e admin/banir. Fica de fora (para encurtar): rotina semanal de caronas e cancelar com penalidade.
+Se faltar tempo, o trecho que mais impressiona é o 2:35–3:30 (iniciar + mapa ao vivo) — priorize ele.
+Duas janelas (normal + anônima) deixam claro o lado motorista × passageiro na mesma tela.
+No mapa, como as duas janelas estão na mesma máquina, os pinos podem ficar quase no mesmo ponto — tudo bem para a demo; é só explicar que em celulares diferentes aparecem separados.

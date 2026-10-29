@@ -1,0 +1,195 @@
+<%- include('partials/head') %>
+
+<div class="perfil">
+  <div class="perfil-cabecalho">
+    <div class="perfil-avatar">
+      <% if (alvo.foto) { %>
+        <img src="<%= alvo.foto %>" alt="Foto de <%= alvo.nome %>">
+      <% } else { %>
+        <%= alvo.nome.charAt(0).toUpperCase() %>
+      <% } %>
+    </div>
+    <div>
+      <h1><%= alvo.nome %></h1>
+      <p class="perfil-sub">
+        <% if (reputacao && reputacao.total > 0) { %>
+          ⭐ <%= reputacao.media %> · <%= reputacao.total %> avaliação(ões)
+        <% } else { %>
+          Ainda sem avaliações
+        <% } %>
+      </p>
+    </div>
+  </div>
+
+  <% if (usuario && usuario.id === alvo.id) { %>
+    <section class="conta-editar">
+      <h2 class="secao-titulo">Minha conta</h2>
+      <div class="conta-cards">
+        <form class="form conta-card foto-card" action="/conta/foto" method="POST" id="form-foto">
+          <h3 class="conta-card-titulo">Foto de perfil</h3>
+          <div class="foto-preview">
+            <% if (alvo.foto) { %>
+              <img id="foto-img" src="<%= alvo.foto %>" alt="Sua foto">
+            <% } else { %>
+              <span id="foto-inicial" class="foto-inicial"><%= alvo.nome.charAt(0).toUpperCase() %></span>
+              <img id="foto-img" src="" alt="Prévia da foto" hidden>
+            <% } %>
+          </div>
+          <input type="hidden" name="foto" id="foto-dados">
+          <label class="btn btn-ghost btn-block" for="foto-arquivo">Escolher foto…</label>
+          <input type="file" id="foto-arquivo" accept="image/*" hidden>
+          <p class="form-dica" id="foto-aviso">Formatos: JPG, PNG, WEBP. A imagem é reduzida automaticamente.</p>
+          <button type="submit" class="btn btn-primary btn-block" id="foto-salvar" disabled>Salvar foto</button>
+          <% if (alvo.foto) { %>
+            <button type="submit" name="remover" value="1" class="btn btn-ghost btn-block btn-perigo">Remover foto</button>
+          <% } %>
+        </form>
+
+        <form class="form conta-card" action="/conta/dados" method="POST">
+          <h3 class="conta-card-titulo">Dados e e-mail</h3>
+          <label>
+            Nome
+            <input type="text" name="nome" value="<%= alvo.nome %>" required>
+          </label>
+          <label>
+            Telefone / WhatsApp
+            <input type="text" name="telefone" value="<%= alvo.telefone || '' %>" placeholder="(15) 99999-9999">
+          </label>
+          <label>
+            E-mail (login)
+            <input type="email" name="email" value="<%= alvo.email %>" required>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block">Salvar dados</button>
+        </form>
+
+        <form class="form conta-card" action="/conta/senha" method="POST">
+          <h3 class="conta-card-titulo">Trocar senha</h3>
+          <label>
+            Senha atual
+            <input type="password" name="senha_atual" required>
+          </label>
+          <label>
+            Nova senha
+            <input type="password" name="nova_senha" minlength="6" required>
+          </label>
+          <label>
+            Confirmar nova senha
+            <input type="password" name="confirmar_senha" minlength="6" required>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block">Alterar senha</button>
+        </form>
+      </div>
+
+      <h2 class="secao-titulo">🚗 Meus carros</h2>
+      <p class="form-dica">Cadastre seus carros aqui e escolha um deles ao oferecer uma carona, sem digitar tudo de novo.</p>
+      <div class="meus-carros">
+        <% if (veiculos && veiculos.length) { %>
+          <% veiculos.forEach(function(v){ %>
+            <div class="carro-item">
+              <div class="carro-info">
+                <strong><%= v.modelo %></strong>
+                <span>
+                  <%= v.cor ? v.cor : '' %><%= v.cor && v.placa ? ' · ' : '' %><%= v.placa ? v.placa : '' %>
+                  · 💺 <%= v.capacidade %> lugares
+                </span>
+              </div>
+              <form action="/veiculos/<%= v.id %>/remover" method="POST" class="inline"
+                    onsubmit="return confirm('Remover este carro do seu perfil?');">
+                <button class="btn btn-ghost btn-sm btn-perigo">Remover</button>
+              </form>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p class="vazio-inline">Você ainda não cadastrou nenhum carro.</p>
+        <% } %>
+
+        <form class="form conta-card carro-novo" action="/veiculos" method="POST">
+          <h3 class="conta-card-titulo">Adicionar carro</h3>
+          <div class="form-linha">
+            <label>
+              Modelo
+              <input type="text" name="modelo" placeholder="Ex.: Honda Fit" required>
+            </label>
+            <label>
+              Lugares
+              <input type="number" name="capacidade" min="1" max="8" value="4" required>
+            </label>
+          </div>
+          <div class="form-linha">
+            <label>
+              Placa (opcional)
+              <input type="text" name="placa" placeholder="Ex.: ABC1D23" maxlength="8">
+            </label>
+            <label>
+              Cor (opcional)
+              <input type="text" name="cor" placeholder="Ex.: Prata">
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Salvar carro</button>
+        </form>
+      </div>
+    </section>
+  <% } %>
+
+  <h2 class="secao-titulo">Avaliações recebidas</h2>
+  <% if (avaliacoes.length === 0) { %>
+    <p class="vazio-inline">Nenhuma avaliação ainda.</p>
+  <% } else { %>
+    <div class="lista-avaliacoes">
+      <% avaliacoes.forEach(function(a){ %>
+        <div class="avaliacao-item">
+          <div class="avaliacao-topo">
+            <span class="avaliacao-estrelas"><%= '⭐'.repeat(a.nota) %></span>
+            <span class="avaliacao-autor">— <%= a.avaliador_nome %></span>
+          </div>
+          <% if (a.comentario) { %><p class="avaliacao-texto"><%= a.comentario %></p><% } %>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  // Foto de perfil: lê o arquivo escolhido, reduz para no máx. 256px num canvas
+  // e guarda como data URL no campo escondido — sem precisar de upload multipart.
+  (function () {
+    var input = document.getElementById('foto-arquivo');
+    if (!input) return;
+    var dados = document.getElementById('foto-dados');
+    var img = document.getElementById('foto-img');
+    var inicial = document.getElementById('foto-inicial');
+    var salvar = document.getElementById('foto-salvar');
+    var aviso = document.getElementById('foto-aviso');
+    var MAX = 256;
+
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      if (!file) return;
+      if (!/^image\//.test(file.type)) {
+        aviso.textContent = 'Esse arquivo não é uma imagem.';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var tmp = new Image();
+        tmp.onload = function () {
+          var escala = Math.min(1, MAX / Math.max(tmp.width, tmp.height));
+          var w = Math.round(tmp.width * escala);
+          var h = Math.round(tmp.height * escala);
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(tmp, 0, 0, w, h);
+          var url = canvas.toDataURL('image/jpeg', 0.85);
+          dados.value = url;
+          if (img) { img.src = url; img.hidden = false; }
+          if (inicial) inicial.hidden = true;
+          salvar.disabled = false;
+          aviso.textContent = 'Prévia carregada. Clique em "Salvar foto".';
+        };
+        tmp.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  })();
+</script>
+<%- include('partials/footer') %>

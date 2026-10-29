@@ -1,0 +1,122 @@
+<%- include('partials/head') %>
+
+<section class="hero">
+  <div class="hero-texto">
+    <span class="chip">Exclusivo para a comunidade Facens</span>
+    <h1>A carona entre quem estuda <span class="destaque">junto</span>.</h1>
+    <p class="hero-lead">
+      O BoraJunto conecta estudantes com carro a colegas que precisam de carona —
+      com foco no período noturno, quando o transporte público some. Rápido, seguro
+      e só entre gente da sua faculdade.
+    </p>
+    <div class="hero-acoes">
+      <a href="/cadastro" class="btn btn-primary btn-lg">Começar agora</a>
+      <a href="/login" class="btn btn-ghost btn-lg">Já tenho conta</a>
+    </div>
+    <div class="hero-selos">
+      <span><svg viewBox="0 0 24 24" class="ic"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> E-mail institucional</span>
+      <span><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" fill="none" stroke="currentColor" stroke-width="2"/></svg> Só estudantes</span>
+    </div>
+  </div>
+
+  <div class="hero-arte" aria-hidden="true">
+    <svg viewBox="0 0 420 360" class="ilustra" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="var(--primaria)"/>
+          <stop offset="1" stop-color="var(--primaria-forte)"/>
+        </linearGradient>
+      </defs>
+      <rect x="20" y="24" width="380" height="312" rx="26" fill="var(--superficie-2)"/>
+      <!-- ruas -->
+      <path d="M60 300 Q60 180 180 180 T360 90" fill="none" stroke="var(--borda)" stroke-width="14" stroke-linecap="round"/>
+      <path d="M60 300 Q60 180 180 180 T360 90" fill="none" stroke="url(#g1)" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 18"/>
+      <!-- pino origem -->
+      <g transform="translate(48 268)">
+        <path d="M12 0C5.4 0 0 5.1 0 11.4 0 19.5 12 33 12 33s12-13.5 12-21.6C24 5.1 18.6 0 12 0Z" fill="var(--primaria)"/>
+        <circle cx="12" cy="11" r="4.6" fill="#fff"/>
+      </g>
+      <!-- pino destino -->
+      <g transform="translate(344 58)">
+        <path d="M12 0C5.4 0 0 5.1 0 11.4 0 19.5 12 33 12 33s12-13.5 12-21.6C24 5.1 18.6 0 12 0Z" fill="var(--ink-accent)"/>
+        <circle cx="12" cy="11" r="4.6" fill="#fff"/>
+      </g>
+      <!-- carro -->
+      <g transform="translate(150 150)">
+        <rect x="-8" y="14" width="116" height="34" rx="12" fill="url(#g1)"/>
+        <path d="M14 14 26 -2h44l16 16Z" fill="var(--primaria-forte)"/>
+        <rect x="30" y="0" width="26" height="12" rx="3" fill="var(--superficie)"/>
+        <rect x="60" y="0" width="22" height="12" rx="3" fill="var(--superficie)"/>
+        <circle cx="18" cy="50" r="10" fill="var(--ink)"/><circle cx="18" cy="50" r="4" fill="#fff"/>
+        <circle cx="82" cy="50" r="10" fill="var(--ink)"/><circle cx="82" cy="50" r="4" fill="#fff"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section class="secao">
+  <h2 class="secao-h2">Como funciona</h2>
+  <div class="passos">
+    <div class="passo">
+      <span class="passo-num">1</span>
+      <h3>Cadastre-se</h3>
+      <p>Entre com seu e-mail <strong>@facens.br</strong>. Só quem é da comunidade participa.</p>
+    </div>
+    <div class="passo">
+      <span class="passo-num">2</span>
+      <h3>Ofereça ou busque</h3>
+      <p>Tem carro? Publique sua rota. Precisa de carona? Busque por região e horário.</p>
+    </div>
+    <div class="passo">
+      <span class="passo-num">3</span>
+      <h3>Combine e avalie</h3>
+      <p>O motorista aceita o pedido e, depois da viagem, vocês se avaliam.</p>
+    </div>
+  </div>
+</section>
+
+<section class="secao">
+  <h2 class="secao-h2">Por que usar o BoraJunto</h2>
+  <div class="cards-funcionalidades">
+    <div class="card-func">
+      <span class="card-ic card-ic-verde">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <h3>Cadastro validado</h3>
+      <p>Acesso só com e-mail institucional — uma comunidade de estudantes de verdade.</p>
+    </div>
+    <div class="card-func">
+      <span class="card-ic card-ic-azul">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/></svg>
+      </span>
+      <h3>Oferecer & buscar</h3>
+      <p>Motoristas publicam rota, horário e vagas. Passageiros filtram por região e horário.</p>
+    </div>
+    <div class="card-func">
+      <span class="card-ic card-ic-roxo">
+        <svg viewBox="0 0 24 24"><path d="M7 8h10M7 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 4h16v12H8l-4 4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </span>
+      <h3>Pareamento de trajetos</h3>
+      <p>O sistema cruza trajetos e horários e mostra as caronas mais compatíveis.</p>
+    </div>
+    <div class="card-func">
+      <span class="card-ic card-ic-ambar">
+        <svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </span>
+      <h3>Avaliação mútua</h3>
+      <p>Depois da viagem, motorista e passageiro se avaliam. Confiança para todo mundo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="cta-box">
+    <div>
+      <h2>Pronto para dividir o caminho?</h2>
+      <p>Crie sua conta em menos de um minuto e encontre caronas hoje à noite.</p>
+    </div>
+    <a href="/cadastro" class="btn btn-light btn-lg">Criar minha conta</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

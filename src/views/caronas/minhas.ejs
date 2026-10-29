@@ -1,0 +1,217 @@
+<%- include('../partials/head') %>
+
+<h1 class="pagina-titulo">Minhas caronas</h1>
+
+<!-- ===== Rotinas semanais (molde que gera as caronas) ===== -->
+<% if (rotinas && rotinas.length) { %>
+  <section class="bloco">
+    <div class="bloco-cabecalho">
+      <h2>🔁 Minhas rotinas</h2>
+    </div>
+    <% rotinas.forEach(function(rt){
+         var dd = String(rt.dias_semana).split(',').map(Number);
+         var ordemDias = [1,2,3,4,5,6,0];
+         var nomesDias = ordemDias.filter(function(d){ return dd.indexOf(d) >= 0; })
+                                  .map(function(d){ return diasSemana[d].slice(0,3); }); %>
+      <div class="painel-carona">
+        <div class="painel-carona-topo">
+          <div class="carona-rota">
+            <span class="ponto"><%= rt.origem %></span><span class="seta">→</span><span class="ponto"><%= rt.destino %></span>
+          </div>
+          <% if (rt.ativa) { %>
+            <span class="badge badge-ativa">ativa</span>
+          <% } else { %>
+            <span class="badge badge-encerrada">pausada</span>
+          <% } %>
+        </div>
+        <div class="carona-meta">
+          <span class="tag-sentido"><%= rt.sentido === 'ida' ? '🎓 Ida' : '🏠 Volta' %></span>
+          <span>🔁 <%= nomesDias.join(', ') %></span>
+          <span>🕒 <%= rt.horario %></span>
+          <span>💺 <%= rt.vagas_total %> lugares</span>
+          <% if (rt.validade) { %><span>📅 até <%= rt.validade.split('-').reverse().join('/') %></span><% } %>
+        </div>
+        <% if (rt.pedidos_pendentes > 0) { %>
+          <p class="vazio-inline">📨 <%= rt.pedidos_pendentes %> pedido(s) pendente(s) nas caronas desta rotina — responda nos cards abaixo.</p>
+        <% } %>
+        <div class="painel-carona-acoes">
+          <% if (rt.ativa) { %>
+            <form action="/rotinas/<%= rt.id %>/pausar" method="POST" class="inline">
+              <button class="btn btn-ghost btn-sm">Pausar rotina</button>
+            </form>
+          <% } else { %>
+            <form action="/rotinas/<%= rt.id %>/retomar" method="POST" class="inline">
+              <button class="btn btn-primary btn-sm">Retomar rotina</button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+    <p class="vazio-inline">As caronas geradas por estas rotinas aparecem logo abaixo, como qualquer carona.</p>
+  </section>
+<% } %>
+
+<!-- ===== Caronas que EU ofereço (motorista) ===== -->
+<section class="bloco">
+  <div class="bloco-cabecalho">
+    <h2>🚗 Ofereço carona</h2>
+    <a href="/caronas/oferecer" class="btn btn-ghost btn-sm">+ Nova carona</a>
+  </div>
+
+  <% if (oferecidas.length === 0) { %>
+    <p class="vazio-inline">Você ainda não ofereceu nenhuma carona.</p>
+  <% } else { %>
+    <% oferecidas.forEach(function(c){ %>
+      <% var cheia = c.status === 'ativa' && c.vagas_disponiveis <= 0; %>
+      <% var aceitos = c.reservas.filter(function(r){ return r.status === 'aceita'; }).length; %>
+      <div class="painel-carona">
+        <div class="painel-carona-topo">
+          <div class="carona-rota">
+            <span class="ponto"><%= c.origem %></span><span class="seta">→</span><span class="ponto"><%= c.destino %></span>
+          </div>
+          <% if (cheia) { %>
+            <span class="badge badge-lotada">Lotada</span>
+          <% } else { %>
+            <span class="badge badge-<%= c.status %>"><%= c.status %></span>
+          <% } %>
+        </div>
+        <div class="carona-meta">
+          <span class="tag-sentido"><%= c.sentido === 'ida' ? '🎓 Ida' : '🏠 Volta' %></span>
+          <% if (c.recorrencia_id) { %><span class="tag-sentido">🔁 Recorrente</span><% } %>
+          <span>📅 <%= c.data_viagem.split('-').reverse().join('/') %></span>
+          <span>🕒 <%= c.horario %></span>
+          <% if (c.veiculo_modelo) { %><span>🚗 <%= c.veiculo_modelo %></span><% } %>
+          <span>💺 <%= c.vagas_disponiveis %>/<%= c.vagas_total %> lugares</span>
+        </div>
+
+        <div class="reservas">
+          <h4>Pedidos (<%= c.reservas.length %>)</h4>
+          <% if (c.reservas.length === 0) { %>
+            <p class="vazio-inline">Nenhum pedido ainda.</p>
+          <% } else { %>
+            <% c.reservas.forEach(function(r){ %>
+              <div class="reserva-linha">
+                <span class="reserva-nome">
+                  <a href="/usuarios/<%= r.passageiro_id %>"><%= r.passageiro_nome %></a>
+                  <% if (r.status === 'aceita' && r.passageiro_telefone) { %>
+                    <span class="reserva-fone">📱 <%= r.passageiro_telefone %></span>
+                  <% } %>
+                </span>
+                <span class="reserva-acao">
+                  <% if (r.status === 'pendente') { %>
+                    <form action="/reservas/<%= r.id %>/responder" method="POST" class="inline">
+                      <input type="hidden" name="acao" value="aceita">
+                      <button class="btn btn-primary btn-sm">Aceitar</button>
+                    </form>
+                    <form action="/reservas/<%= r.id %>/responder" method="POST" class="inline">
+                      <input type="hidden" name="acao" value="recusada">
+                      <button class="btn btn-ghost btn-sm">Recusar</button>
+                    </form>
+                  <% } else { %>
+                    <span class="badge badge-<%= r.status %>"><%= r.status %></span>
+                  <% } %>
+                  <button type="button" class="btn btn-ghost btn-sm" data-chat-reserva="<%= r.id %>">💬 Conversar</button>
+                </span>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <% if (c.status === 'ativa' && c.inicio_avisado_em) { %>
+          <!-- Corrida já iniciada: motorista pode reenviar o aviso ou finalizar -->
+          <div class="iniciar-corrida">
+            <p class="vazio-inline">🚦 Corrida iniciada: começa em até <%= c.inicio_minutos %> min — ponto de encontro "<%= c.ponto_encontro %>".</p>
+            <div class="corrida-botoes">
+              <a href="/caronas/<%= c.id %>/mapa" class="btn btn-ghost btn-sm">📍 Mapa ao vivo</a>
+              <form action="/caronas/<%= c.id %>/iniciar" method="POST" class="form-iniciar">
+                <span class="form-iniciar-titulo">Reenviar aviso</span>
+                <label>em
+                  <input type="number" name="minutos" min="1" max="120" value="<%= c.inicio_minutos || 10 %>" class="input-min"> min
+                </label>
+                <input type="text" name="ponto_encontro" value="<%= c.ponto_encontro || '' %>" class="input-ponto" required>
+                <button class="btn btn-ghost btn-sm">Reenviar</button>
+              </form>
+              <form action="/caronas/<%= c.id %>/finalizar" method="POST" class="inline"
+                    onsubmit="return confirm('Finalizar esta corrida? Os passageiros serão avisados no chat e poderão avaliar você.');">
+                <button class="btn btn-primary btn-sm">🏁 Finalizar corrida</button>
+              </form>
+            </div>
+          </div>
+        <% } else if (c.status === 'ativa' && aceitos > 0) { %>
+          <!-- Ainda não iniciada, já com passageiro(s) aceito(s): pode iniciar -->
+          <div class="iniciar-corrida">
+            <form action="/caronas/<%= c.id %>/iniciar" method="POST" class="form-iniciar">
+              <span class="form-iniciar-titulo">🚦 Iniciar corrida</span>
+              <label>Começa em
+                <input type="number" name="minutos" min="1" max="120" value="<%= c.inicio_minutos || 10 %>" class="input-min"> min
+              </label>
+              <input type="text" name="ponto_encontro" placeholder="Ponto de encontro (ex.: portaria da Facens)"
+                     value="<%= c.ponto_encontro || '' %>" class="input-ponto" required>
+              <button class="btn btn-primary btn-sm">Avisar <%= aceitos %> passageiro(s)</button>
+            </form>
+          </div>
+        <% } %>
+
+        <div class="painel-carona-acoes">
+          <% if (c.status === 'ativa') { %>
+            <a href="/caronas/<%= c.id %>/avaliar" class="btn btn-ghost btn-sm">⭐ Avaliar passageiros</a>
+            <% if (!c.inicio_avisado_em) { %>
+              <!-- Cancelar só é possível ANTES de iniciar; custa 10% da nota -->
+              <form action="/caronas/<%= c.id %>/cancelar" method="POST" class="inline"
+                    onsubmit="return confirm('Cancelar esta corrida? Você perde 10% da sua nota atual e os passageiros serão avisados.');">
+                <button class="btn btn-ghost btn-sm btn-perigo">❌ Cancelar corrida</button>
+              </form>
+            <% } %>
+          <% } else { %>
+            <a href="/caronas/<%= c.id %>/avaliar" class="btn btn-ghost btn-sm">⭐ Avaliar passageiros</a>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</section>
+
+<!-- ===== Caronas que EU pedi (passageiro) ===== -->
+<section class="bloco">
+  <div class="bloco-cabecalho">
+    <h2>🧍 Peço carona</h2>
+    <a href="/caronas/buscar" class="btn btn-ghost btn-sm">Buscar caronas</a>
+  </div>
+
+  <% if (pedidas.length === 0) { %>
+    <p class="vazio-inline">Você ainda não pediu nenhuma carona.</p>
+  <% } else { %>
+    <% pedidas.forEach(function(r){ %>
+      <div class="painel-carona">
+        <div class="painel-carona-topo">
+          <div class="carona-rota">
+            <span class="ponto"><%= r.origem %></span><span class="seta">→</span><span class="ponto"><%= r.destino %></span>
+          </div>
+          <span class="badge badge-<%= r.status %>"><%= r.status %></span>
+        </div>
+        <div class="carona-meta">
+          <span class="tag-sentido"><%= r.sentido === 'ida' ? '🎓 Ida' : '🏠 Volta' %></span>
+          <span>📅 <%= r.data_viagem.split('-').reverse().join('/') %></span>
+          <span>🕒 <%= r.horario %></span>
+          <span>👤 <a href="/usuarios/<%= r.motorista_id %>"><%= r.motorista_nome %></a></span>
+          <% if (r.status === 'aceita' && r.motorista_telefone) { %>
+            <span>📱 <%= r.motorista_telefone %></span>
+          <% } %>
+        </div>
+        <div class="painel-carona-acoes">
+          <button type="button" class="btn btn-ghost btn-sm" data-chat-reserva="<%= r.id %>">💬 Conversar</button>
+          <% if (r.status === 'pendente' || r.status === 'aceita') { %>
+            <form action="/reservas/<%= r.id %>/cancelar" method="POST" class="inline">
+              <button class="btn btn-ghost btn-sm">Cancelar pedido</button>
+            </form>
+          <% } %>
+          <% if (r.status === 'aceita') { %>
+            <a href="/caronas/<%= r.carona_id %>/avaliar" class="btn btn-ghost btn-sm">⭐ Avaliar motorista</a>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</section>
+
+<%- include('../partials/footer') %>

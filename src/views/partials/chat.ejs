@@ -1,0 +1,44 @@
+<!--
+  Balãozinho de conversas no canto, só para quem está logado. Aqui é só o
+  esqueleto; quem busca, desenha e envia é o /js/chat.js (API em /mensagens/*).
+  As mensagens entram por textContent no JS, nunca innerHTML — o texto é do
+  usuário e innerHTML deixaria passar HTML malicioso.
+-->
+<div id="chat-widget" class="chat-widget" data-usuario="<%= usuario.id %>">
+  <!-- Botão/balão flutuante -->
+  <button type="button" id="chat-botao" class="chat-botao" aria-expanded="false" aria-label="Abrir conversas" title="Conversas">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="chat-botao-ic">
+      <path fill="currentColor" d="M12 3C6.98 3 3 6.58 3 11c0 2.2.99 4.17 2.6 5.6-.1 1.2-.5 2.3-1.3 3.2-.2.24-.05.6.27.62 1.9.08 3.5-.5 4.73-1.43 .86.27 1.78.41 2.7.41 5.02 0 9-3.58 9-8s-3.98-8-9-8Z"/>
+    </svg>
+    <span id="chat-badge" class="chat-badge" hidden>0</span>
+  </button>
+
+  <!-- Painel -->
+  <div id="chat-painel" class="chat-painel" hidden role="dialog" aria-label="Conversas">
+    <!-- Cabeçalho (muda entre "lista" e "conversa aberta") -->
+    <header class="chat-cabecalho">
+      <button type="button" id="chat-voltar" class="chat-voltar" hidden aria-label="Voltar para a lista">←</button>
+      <div class="chat-cabecalho-txt">
+        <strong id="chat-titulo">Conversas</strong>
+        <span id="chat-subtitulo" class="chat-subtitulo"></span>
+      </div>
+      <button type="button" id="chat-fechar" class="chat-fechar" aria-label="Fechar">✕</button>
+    </header>
+
+    <!-- Lista de conversas -->
+    <div id="chat-lista" class="chat-lista"></div>
+
+    <!-- Thread de uma conversa -->
+    <div id="chat-thread" class="chat-thread" hidden>
+      <div id="chat-mensagens" class="chat-mensagens"></div>
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="chat-input" class="chat-input" autocomplete="off"
+               maxlength="1000" placeholder="Escreva uma mensagem…" />
+        <button type="submit" class="chat-enviar" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6 3 10l12 2-12 2 .4 6.4Z"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="/js/chat.js" defer></script>

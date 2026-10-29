@@ -1,0 +1,149 @@
+<%- include('../partials/head') %>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+<a href="/caronas/minhas" class="link-voltar">← Voltar</a>
+
+<div class="mapa-cabecalho">
+  <div>
+    <h1 class="pagina-titulo">📍 Localização da corrida</h1>
+    <p class="form-sub">
+      <%= carona.origem %> → <%= carona.destino %>
+      · 🕒 <%= carona.horario %>
+      · <%= souMotorista ? '🚗 você é o motorista' : '🧍 motorista: ' + carona.motorista_nome %>
+      <% if (carona.ponto_encontro) { %> · ponto de encontro: <strong><%= carona.ponto_encontro %></strong><% } %>
+    </p>
+  </div>
+  <button type="button" id="btn-compartilhar" class="btn btn-primary">📍 Compartilhar minha localização</button>
+</div>
+
+<p class="mapa-status" id="mapa-status">Ninguém compartilhando ainda. Toque em “Compartilhar minha localização”.</p>
+
+<div id="mapa" class="mapa-box"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  (function () {
+    var CARONA_ID = <%= carona.id %>;
+    var MEU_ID = <%= meuId %>;
+    var CORES = { motorista: '#10a37f', passageiro: '#f4763b' };
+    var CENTRO_PADRAO = [-23.5015, -47.4526]; // Sorocaba
+
+    var map = L.map('mapa').setView(CENTRO_PADRAO, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap',
+    }).addTo(map);
+
+    var status = document.getElementById('mapa-status');
+    var botao = document.getElementById('btn-compartilhar');
+    var marcadores = {};   // usuarioId -> L.circleMarker
+    var watchId = null;
+    var ultimoEnvio = 0;
+    var jaCentralizou = false;
+
+    function desenhar(pontos) {
+      var vistos = {};
+      pontos.forEach(function (p) {
+        vistos[p.usuarioId] = true;
+        var cor = CORES[p.papel] || '#3b82f6';
+        var rotulo = p.nome + (p.souEu ? ' (você)' : '') + ' · ' + (p.papel === 'motorista' ? 'motorista' : 'passageiro');
+        if (marcadores[p.usuarioId]) {
+          marcadores[p.usuarioId].setLatLng([p.lat, p.lng]);
+        } else {
+          marcadores[p.usuarioId] = L.circleMarker([p.lat, p.lng], {
+            radius: p.souEu ? 10 : 8,
+            color: '#fff', weight: 2, fillColor: cor, fillOpacity: 0.95,
+          }).addTo(map).bindTooltip(rotulo, { permanent: false });
+        }
+      });
+      // Remove quem parou de compartilhar (saiu da janela de tempo).
+      Object.keys(marcadores).forEach(function (id) {
+        if (!vistos[id]) { map.removeLayer(marcadores[id]); delete marcadores[id]; }
+      });
+
+      var n = pontos.length;
+      if (n && !jaCentralizou) {
+        var grupo = L.featureGroup(Object.values(marcadores));
+        map.fitBounds(grupo.getBounds().pad(0.3), { maxZoom: 16 });
+        jaCentralizou = true;
+      }
+      if (n === 0) {
+        status.textContent = 'Ninguém compartilhando ainda. Toque em “Compartilhar minha localização”.';
+      } else {
+        status.textContent = n + ' pessoa(s) compartilhando agora.';
+      }
+    }
+
+    function buscar() {
+      fetch('/caronas/' + CARONA_ID + '/localizacao')
+        .then(function (r) { return r.ok ? r.json() : { pontos: [] }; })
+        .then(function (d) { desenhar(d.pontos || []); })
+        .catch(function () {});
+    }
+
+    function enviar(lat, lng) {
+      var agora = Date.now();
+      if (agora - ultimoEnvio < 3000) return; // no máximo a cada 3s
+      ultimoEnvio = agora;
+      fetch('/caronas/' + CARONA_ID + '/localizacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat: lat, lng: lng }),
+      }).then(buscar).catch(function () {});
+    }
+
+    function pararCompartilhar() {
+      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+      botao.textContent = '📍 Compartilhar minha localização';
+      botao.classList.remove('btn-perigo');
+      botao.classList.add('btn-primary');
+    }
+
+    function iniciarCompartilhar() {
+      if (!navigator.geolocation) {
+        status.textContent = 'Seu navegador não tem suporte a localização.';
+        return;
+      }
+      status.textContent = 'Pedindo permissão de localização…';
+      watchId = navigator.geolocation.watchPosition(
+        function (pos) {
+          var lat = pos.coords.latitude, lng = pos.coords.longitude;
+          if (!jaCentralizou) { map.setView([lat, lng], 15); }
+          enviar(lat, lng);
+        },
+        function (err) {
+          pararCompartilhar();
+          if (err.code === err.PERMISSION_DENIED) {
+            status.textContent = 'Permissão de localização negada. Libere no navegador para compartilhar.';
+          } else {
+            status.textContent = 'Não foi possível obter sua localização agora.';
+          }
+        },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      );
+      botao.textContent = '⏹️ Parar de compartilhar';
+      botao.classList.remove('btn-primary');
+      botao.classList.add('btn-perigo');
+    }
+
+    botao.addEventListener('click', function () {
+      if (watchId === null) iniciarCompartilhar(); else pararCompartilhar();
+    });
+
+    // Atualiza o mapa de tempos em tempos e já na entrada.
+    buscar();
+    setInterval(buscar, 4000);
+
+    // Se veio do aviso "Compartilhar localização", já começa a compartilhar.
+    var params = new URLSearchParams(location.search);
+    if (params.get('compartilhar') === '1') iniciarCompartilhar();
+
+    // Para de compartilhar ao sair da página (não fica enviando em segundo plano).
+    window.addEventListener('pagehide', pararCompartilhar);
+  })();
+</script>
+
+<%- include('../partials/footer') %>

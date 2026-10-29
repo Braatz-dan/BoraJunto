@@ -1,0 +1,30 @@
+<%- include('partials/head') %>
+
+<div class="form-wrap">
+  <h1 class="form-titulo">Entrar</h1>
+  <p class="form-sub">Acesse com seu e-mail institucional.</p>
+
+  <form action="/login" method="POST" class="form">
+    <label>
+      E-mail
+      <input type="email" name="email" value="<%= dados.email || '' %>" placeholder="nome.sobrenome@facens.br" required>
+    </label>
+    <label>
+      Senha
+      <input type="password" name="senha" required>
+    </label>
+    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+  </form>
+
+  <div class="demo-box">
+    <strong>Contas de demonstração</strong> (senha <code>123456</code>):<br>
+    🚗 Motorista — <code>rafael.andrade@facens.br</code><br>
+    🧍 Passageira — <code>mariana.lopes@facens.br</code><br>
+    🧍 Passageiro — <code>bruno.carvalho@facens.br</code><br>
+    🧍 Passageira (sem caronas) — <code>larissa.nogueira@facens.br</code>
+  </div>
+
+  <p class="form-rodape">Não tem conta? <a href="/cadastro">Criar agora</a></p>
+</div>
+
+<%- include('partials/footer') %>

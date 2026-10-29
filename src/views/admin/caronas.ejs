@@ -1,0 +1,38 @@
+<%- include('../partials/head') %>
+
+<a href="/admin" class="link-voltar">← Painel</a>
+<h1 class="pagina-titulo">🚗 Corridas</h1>
+<p class="form-sub"><%= caronas.length %> corrida(s) no total.</p>
+
+<div class="admin-tabela-wrap">
+  <table class="admin-tabela">
+    <thead>
+      <tr><th>#</th><th>Rota</th><th>Motorista</th><th>Data</th><th>Hora</th><th>Vagas</th><th>Pedidos</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% caronas.forEach(function(c){ %>
+        <tr>
+          <td><%= c.id %></td>
+          <td><%= c.origem %> → <%= c.destino %></td>
+          <td><a href="/usuarios/<%= c.motorista_id %>"><%= c.motorista_nome %></a></td>
+          <td><%= c.data_viagem.split('-').reverse().join('/') %></td>
+          <td><%= c.horario %></td>
+          <td><%= c.vagas_disponiveis %>/<%= c.vagas_total %></td>
+          <td><%= c.n_reservas %></td>
+          <td>
+            <span class="badge badge-<%= c.status %>"><%= c.status %></span>
+            <% if (c.inicio_avisado_em && c.status === 'ativa') { %><span class="badge badge-ativa">iniciada</span><% } %>
+          </td>
+          <td>
+            <form action="/admin/caronas/<%= c.id %>/remover" method="POST" class="inline"
+                  onclick="return confirm('Remover a corrida #<%= c.id %>? Isso apaga reservas, mensagens e avaliações dela.');">
+              <button class="btn btn-ghost btn-sm btn-perigo">Remover</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

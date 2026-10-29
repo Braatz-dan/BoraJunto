@@ -1,0 +1,28 @@
+<%
+  var DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  var diaLabel = DIAS[new Date(c.data_viagem + 'T00:00:00').getDay()];
+%>
+<a class="carona-card" href="/caronas/<%= c.id %>">
+  <div class="carona-rota">
+    <span class="ponto"><%= c.origem %></span>
+    <span class="seta">→</span>
+    <span class="ponto"><%= c.destino %></span>
+  </div>
+  <div class="carona-meta">
+    <span>📅 <%= diaLabel %>, <%= c.data_viagem.split('-').reverse().join('/') %></span>
+    <span>🕒 <%= c.horario %></span>
+    <span>💺 <%= c.vagas_disponiveis %>/<%= c.vagas_total %> lugares</span>
+    <span>💰 R$ <%= Number(c.valor_rateio).toFixed(2) %></span>
+    <% if (c.recorrencia_id) { %><span class="chip-recorrente">🔁 toda semana</span><% } %>
+  </div>
+  <% if (c.bairro || c.cidade) { %>
+    <div class="carona-regiao">📍 <%= [c.bairro, c.cidade].filter(Boolean).join(' — ') %><%= c.uf ? '/' + c.uf : '' %></div>
+  <% } %>
+  <% if (c.veiculo_modelo) { %>
+    <div class="carona-carro">🚗 <%= c.veiculo_modelo %><% if (c.veiculo_cor) { %> · <%= c.veiculo_cor %><% } %></div>
+  <% } %>
+  <div class="carona-motorista">
+    <span>👤 <%= c.motorista_nome %></span>
+    <% if (c.motorista_nota) { %><span class="nota">⭐ <%= c.motorista_nota %></span><% } %>
+  </div>
+</a>

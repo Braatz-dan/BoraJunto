@@ -1,0 +1,44 @@
+<%- include('../partials/head') %>
+
+<a href="/caronas/minhas" class="link-voltar">← Voltar</a>
+
+<div class="form-wrap">
+  <h1 class="form-titulo">Avaliar</h1>
+  <p class="form-sub">
+    Carona <%= carona.origem %> → <%= carona.destino %>
+    · <%= carona.data_viagem.split('-').reverse().join('/') %>
+  </p>
+
+  <form action="/caronas/<%= carona.id %>/avaliar" method="POST" class="form">
+    <label>
+      Quem você quer avaliar?
+      <select name="avaliado_id" required>
+        <% avaliaveis.forEach(function(p){ %>
+          <option value="<%= p.id %>" <%= p.jaAvaliado ? 'disabled' : '' %>>
+            <%= p.nome %><%= p.jaAvaliado ? ' (já avaliado)' : '' %>
+          </option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label>
+      Nota
+      <select name="nota" required>
+        <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+        <option value="4">⭐⭐⭐⭐ Bom</option>
+        <option value="3">⭐⭐⭐ Regular</option>
+        <option value="2">⭐⭐ Ruim</option>
+        <option value="1">⭐ Péssimo</option>
+      </select>
+    </label>
+
+    <label>
+      Comentário (opcional)
+      <textarea name="comentario" rows="3" placeholder="Como foi a viagem?"></textarea>
+    </label>
+
+    <button type="submit" class="btn btn-primary btn-block">Enviar avaliação</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
